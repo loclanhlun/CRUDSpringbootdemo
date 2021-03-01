@@ -1,7 +1,5 @@
 package com.huynhbaoloc.demo.converter;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
 
 import com.huynhbaoloc.demo.dto.NewDTO;
@@ -28,6 +26,7 @@ public class NewConverter {
 		newDTO.setContent(entity.getContent());
 		newDTO.setShortDescription(entity.getShortDescription());
 		newDTO.setThumbnail(entity.getThumbnail());
+		newDTO.setCategoryCode(entity.getCategory().getCode());
 		return newDTO;
 	}
 	
@@ -39,11 +38,11 @@ public class NewConverter {
 		return entity;
 	}
 
-	public NewEntity toEntity(NewDTO newDTO, Optional<NewEntity> entity) {
-		entity.get().setTitle(newDTO.getTitle());
-		entity.get().setContext(newDTO.getContent());
-		entity.get().setShortDescription(newDTO.getShortDescription());
-		entity.get().setThumbnail(newDTO.getThumbnail());
-		return entity.get();
-	}
+//	public NewEntity toEntity(NewDTO newDTO, Optional<NewEntity> entity) {
+//		entity.get().setTitle(newDTO.getTitle());
+//		entity.get().setContext(newDTO.getContent());
+//		entity.get().setShortDescription(newDTO.getShortDescription());
+//		entity.get().setThumbnail(newDTO.getThumbnail());
+//		return entity.get();
+//	}
 }	

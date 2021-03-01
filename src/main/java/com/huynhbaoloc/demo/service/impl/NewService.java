@@ -2,7 +2,6 @@ package com.huynhbaoloc.demo.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,43 +16,46 @@ import com.huynhbaoloc.demo.service.INewService;
 
 @Service
 public class NewService implements INewService {
-	
+
 	@Autowired
 	private NewRepository newRepository;
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
-	
+
 	@Autowired
 	private NewConverter newConverter;
 
 	@Override
-	public List<NewDTO> getListNew() {
+	public List<NewDTO> getListNew(String keyword) {
 		List<NewDTO> list = new ArrayList<NewDTO>();
 		List<NewEntity> listEntity = newRepository.findAll();
-		for(NewEntity item : listEntity) {
-			NewDTO newDTO = new NewDTO();
-			newDTO.setId(item.getId());
-			newDTO.setTitle(item.getTitle());
-			newDTO.setContent(item.getContent());
-			newDTO.setThumbnail(item.getThumbnail());
-			newDTO.setShortDescription(item.getShortDescription());	
-			newDTO.setCategoryCode(item.getCategory().getCode());
-			list.add(newDTO);
+		if (keyword == null) {
+			for (NewEntity item : listEntity) {
+				list.add(newConverter.toDTO(item));
+			}
+		} else {
+			for (NewEntity entity : listEntity) {
+				if (entity.getTitle().contains(keyword)) {
+					list.add(newConverter.toDTO(entity));
+				}
+			}
 		}
-		return  list;
+		return list;
 	}
 
 	@Override
 	public NewDTO save(NewDTO newDTO) {
 		NewEntity newEntity = new NewEntity();
-		if(newDTO.getId() != null) {
-			Optional<NewEntity> oldNewEntity = newRepository.findById(newDTO.getId());
-			newEntity = newConverter.toEntity(newDTO,  oldNewEntity);
-			
-		}else if(newDTO.getId() == null) {
+		if (newDTO.getId() != null) {
+			NewEntity oldNewEntity = newRepository.findById(newDTO.getId()).orElse(null);
+			if (oldNewEntity == null) {
+				return null;
+			}
+			newEntity = newConverter.toEntity(newDTO, oldNewEntity);
+
+		} else if (newDTO.getId() == null) {
 			newEntity = newConverter.toEntity(newDTO);
-			
 		}
 		CategoryEntity categoryEntity = categoryRepository.findOneByCode(newDTO.getCategoryCode());
 		newEntity.setCategory(categoryEntity);
@@ -61,16 +63,27 @@ public class NewService implements INewService {
 		return newConverter.toDTO(newEntity);
 	}
 
-	
+	@Override
+	public NewDTO getById(Long id) {
+		NewEntity entity = newRepository.findById(id).orElse(null);
+		if (entity == null) {
+			return null;
+		}
+		return newConverter.toDTO(entity);
+	}
 
-	/*@Override
-	public NewDTO update(NewDTO newDTO) {
-		NewEntity oldNewEntity = newRepository.getOne(newDTO.getId());
-		NewEntity newEntity = newConverter.toEntity(newDTO,  oldNewEntity);
-		CategoryEntity categoryEntity = categoryRepository.findOneByCode(newDTO.getCategoryCode());
-		newEntity.setCategory(categoryEntity);
-		newEntity = newRepository.save(newEntity);
-		return newConverter.toDTO(newEntity);
-	}*/
+	@Override
+	public void delete(Long id) {
+		newRepository.deleteById(id);
+	}
+
+	/*
+	 * @Override public NewDTO update(NewDTO newDTO) { NewEntity oldNewEntity =
+	 * newRepository.getOne(newDTO.getId()); NewEntity newEntity =
+	 * newConverter.toEntity(newDTO, oldNewEntity); CategoryEntity categoryEntity =
+	 * categoryRepository.findOneByCode(newDTO.getCategoryCode());
+	 * newEntity.setCategory(categoryEntity); newEntity =
+	 * newRepository.save(newEntity); return newConverter.toDTO(newEntity); }
+	 */
 
 }
