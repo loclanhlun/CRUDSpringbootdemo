@@ -1,16 +1,22 @@
 package com.huynhbaoloc.demo.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class NewDTO extends AbstractDTO<NewDTO>{
 	
-
+	@ApiModelProperty(notes = "This is title of the news")
 	private String title;
 
+	@ApiModelProperty(notes = "The thumbnail")
 	private String thumbnail;
 
+	@ApiModelProperty(notes = "The content")
 	private String content;
 
+	@ApiModelProperty(notes = "The shortDescription")
 	private String shortDescription;
 
+	@ApiModelProperty(notes = "The categoryCode")
 	private String categoryCode;
 	
 	
